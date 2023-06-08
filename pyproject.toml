@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "lm-human-preferences"
+version = "0.1.0"
+description = ""
+authors = ["Costa Huang <costa.huang@outlook.com>"]
+readme = "README.md"
+packages = [{include = "lm_human_preferences"}]
+
+[tool.poetry.dependencies]
+python = ">=3.7,<3.8"
+cloudpickle = "1.2.1"
+dataclasses = "0.6.0"
+fire = "0.1.3"
+ftfy = "5.4.1"
+mpi4py = "3.0.2"
+mypy = "0.580"
+numpy = "1.16.2"
+pytest-instafail = "0.3.0"
+pytest-timeout = "1.2.0"
+pytest = "3.5.0"
+pytz = "2019.1"
+regex = "2017.4.5"
+requests = "2.18.0"
+tqdm = "4.31.1"
+typeguard = ">=2.2.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

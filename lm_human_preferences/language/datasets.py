@@ -3,9 +3,9 @@ from typing import Dict
 
 import tensorflow as tf
 
-from lm_human_preferences.datasets.books import books_generator
-from lm_human_preferences.datasets.cnndm import cnndm_generator
-from lm_human_preferences.datasets.tldr import tldr_generator
+from lm_human_preferences.oaidatasets.books import books_generator
+from lm_human_preferences.oaidatasets.cnndm import cnndm_generator
+from lm_human_preferences.oaidatasets.tldr import tldr_generator
 
 _registry: Dict[str, "Dataset"] = {}
 
@@ -118,7 +118,7 @@ Test = Dataset(
 
 """
 import tensorflow as tf
-from lm_human_preferences.language.datasets import Books as ds
+from lm_human_preferences.language.oaidatasets import Books as ds
 from lm_human_preferences.language.encodings import Main as encoding
 
 e = encoding.get_encoder()

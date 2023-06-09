@@ -79,6 +79,7 @@ def download_labels(source, label_type, question_schemas, total_labels, comm):
 
     # TODO: download on just one rank?  then do: labels = utils.mpi_bcast_tensor_dict(labels, comm=comm)
     if source != 'test':
+        print("source", source, "comm", comm)
         with open(gcs.download_file_cached(source, comm=comm)) as f:
             results = json.load(f)
             print('Num labels found in source:', len(results))

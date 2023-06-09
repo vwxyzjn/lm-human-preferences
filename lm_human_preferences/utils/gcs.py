@@ -6,6 +6,7 @@ import traceback
 import warnings
 from functools import wraps
 from urllib.parse import urlparse, unquote
+import urllib.request 
 
 import requests
 from google.api_core.exceptions import InternalServerError, ServiceUnavailable
@@ -58,7 +59,6 @@ def parse_url(url):
     if result.scheme == 'gs':
         return result.netloc, unquote(result.path.lstrip('/'))
     elif result.scheme == 'https':
-        assert result.netloc == 'storage.googleapis.com'
         bucket, rest = result.path.lstrip('/').split('/', 1)
         return bucket, unquote(rest)
     else:
@@ -129,10 +129,9 @@ def download_file_cached(url, comm=None):
     if is_master:
         if not os.path.exists(local_path):
             os.makedirs(os.path.dirname(local_path), exist_ok=True)
-            cmd = 'gsutil', '-m', 'cp', url, local_path
-            print(' '.join(cmd))
-            subprocess.check_call(cmd)
-            open(sentinel, 'a').close()
+            print("downloading", url, "to", local_path)
+            urllib.request.urlretrieve(url, local_path)
+        open(sentinel, 'a').close()
     else:
         while not os.path.exists(sentinel):
             time.sleep(1)

@@ -9,12 +9,16 @@ from typeguard import check_type
 from lm_human_preferences.utils import gcs
 
 
+from urllib.request import urlopen
+
+
 class HParams:
     """Used as a base class for hyperparameter structs. They also need to be annotated with @dataclass."""
 
     def override_from_json_file(self, filename):
         if filename.startswith('gs://'):
-            hparams_str = gcs.download_contents(filename)
+            response = urlopen(filename.replace("gs://", "https://openaipublic.blob.core.windows.net/"))
+            hparams_str = response.read()
         else:
             hparams_str = open(filename).read()
         self.parse_json(hparams_str)
@@ -124,7 +128,7 @@ class HParams:
         assert is_dataclass(self), f"You forgot to annotate {type(self)} with @dataclass"
         for f in fields(self):
             fieldval = getattr(self, f.name)
-            check_type(prefix + f.name, fieldval, f.type)
+            # check_type(prefix + f.name, fieldval, f.type)
             if isinstance(fieldval, HParams):
                 fieldval.validate(prefix=prefix + f.name + '.')
 

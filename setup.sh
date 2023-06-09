@@ -14,15 +14,28 @@ source ~/.bashrc
 # setup conda
 pyenv install miniconda3-4.7.12
 pyenv activate miniconda3-4.7.12
-conda create -n myenv -c conda-forge tensorflow-gpu=1.15
-conda activate myenv
+conda create -n myenv4 -c anaconda tensorflow-gpu=1.14
+conda activate myenv4
 
-poetry install
-poetry run pip install tensorflow-gpu==1.13.1
-poetry run pip install horovod==0.18.1
+
+pip install "cloudpickle==1.2.1" "dataclasses==0.6.0" "fire==0.1.3" "ftfy==5.4.1" "mpi4py==3.0.2" "mypy==0.580" "numpy==1.16.2" "pytest-instafail==0.3.0" "pytest-timeout==1.2.0" "pytest==3.5.0" "pytz==2019.1" "regex==2017.4.5" "requests==2.18.0" "tqdm==4.31.1" "typeguard>=2.2.2"
+pip install "google-api-python-client==1.7.8" "google-cloud-storage==1.13.0"
 
 experiment=descriptiveness
 reward_experiment_name=testdesc-$(date +%y%m%d%H%M)
-poetry run python launch.py train_reward $experiment $reward_experiment_name
 
+
+mkdir -p gpt-2/encodings
+wget -O gpt-2/encodings/encoder.json https://dl.fbaipublicfiles.com/fairseq/gpt2_bpe/encoder.json
+wget -O gpt-2/encodings/vocab.bpe https://dl.fbaipublicfiles.com/fairseq/gpt2_bpe/vocab.bpe
+mkdir -p gpt-2/models/124M/
+wget -O gpt-2/models/124M/checkpoint https://openaipublic.blob.core.windows.net/gpt-2/models/124M/checkpoint
+wget -O gpt-2/models/124M/encoder.json https://openaipublic.blob.core.windows.net/gpt-2/models/124M/encoder.json
+wget -O gpt-2/models/124M/hparams.json https://openaipublic.blob.core.windows.net/gpt-2/models/124M/hparams.json
+wget -O gpt-2/models/124M/model.ckpt.data-00000-of-00001 https://openaipublic.blob.core.windows.net/gpt-2/models/124M/model.ckpt.data-00000-of-00001
+wget -O gpt-2/models/124M/model.ckpt.index https://openaipublic.blob.core.windows.net/gpt-2/models/124M/model.ckpt.index
+wget -O gpt-2/models/124M/model.ckpt.meta https://openaipublic.blob.core.windows.net/gpt-2/models/124M/model.ckpt.meta
+wget -O gpt-2/models/124M/vocab.bpe https://openaipublic.blob.core.windows.net/gpt-2/models/124M/vocab.bpe
+
+python launch.py train_reward $experiment $reward_experiment_name
 

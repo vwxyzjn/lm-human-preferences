@@ -10,7 +10,7 @@ class TrainedModel():
     def __init__(self, name, *, savedir=None, scope=None):
         self.name = name
         self.scope = scope
-        self.savedir = savedir if savedir else os.path.join('gs://gpt-2/models/', name)
+        self.savedir = "gpt-2/models/124M" # savedir if savedir else os.path.join('gs://gpt-2/models/', name)
         if name == 'test':
             self.encoding = encodings.Test
         else:

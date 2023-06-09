@@ -135,7 +135,7 @@ class Encoding:
         self.n_vocab = n_vocab
 
         if base_path is None:
-            base_path = os.path.join("gs://gpt-2/encodings", name)
+            base_path = "gpt-2/encodings"
 
         self.base_path = base_path
         if name != "test":

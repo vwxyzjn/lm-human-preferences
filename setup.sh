@@ -14,12 +14,13 @@ source ~/.bashrc
 # setup conda
 pyenv install miniconda3-4.7.12
 pyenv activate miniconda3-4.7.12
-conda create -n myenv4 -c anaconda tensorflow-gpu=1.14
-conda activate myenv4
+conda create -n myenv -c anaconda tensorflow-gpu=1.14
+conda activate myenv
 
 
 pip install "cloudpickle==1.2.1" "dataclasses==0.6.0" "fire==0.1.3" "ftfy==5.4.1" "mpi4py==3.0.2" "mypy==0.580" "numpy==1.16.2" "pytest-instafail==0.3.0" "pytest-timeout==1.2.0" "pytest==3.5.0" "pytz==2019.1" "regex==2017.4.5" "requests==2.18.0" "tqdm==4.31.1" "typeguard>=2.2.2"
 pip install "google-api-python-client==1.7.8" "google-cloud-storage==1.13.0"
+pip install datasets
 
 experiment=descriptiveness
 reward_experiment_name=testdesc-$(date +%y%m%d%H%M)
@@ -39,3 +40,18 @@ wget -O gpt-2/models/124M/vocab.bpe https://openaipublic.blob.core.windows.net/g
 
 python launch.py train_reward $experiment $reward_experiment_name
 
+bookcorpus
+https://huggingface.co/datasets/bookcorpus
+
+Daily mail, len(287227)
+https://huggingface.co/datasets/cnn_dailymail
+
+
+TLDR: len(datas) = 3053579
+https://huggingface.co/datasets/webis/tldr-17
+
+# ensure GPU works
+python -c 'from tensorflow.python.client import device_lib; print(device_lib.list_local_devices())'
+
+
+wget https://openaipublic.blob.core.windows.net/lm-human-preferences/tldr/train-subset.json

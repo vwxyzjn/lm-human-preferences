@@ -14,10 +14,8 @@ source ~/.bashrc
 # setup conda
 pyenv install miniconda3-4.7.12
 pyenv activate miniconda3-4.7.12
-conda create -y -n myenv -c anaconda tensorflow-gpu=1.14
+conda create -y -n myenv -c anaconda tensorflow-gpu=1.13
 conda activate myenv
-conda create -y -n myenv2 -c anaconda tensorflow-gpu=1.13
-conda activate myenv2
 
 
 pip install "cloudpickle==1.2.1" "dataclasses==0.6.0" "fire==0.1.3" "ftfy==5.4.1" "mpi4py==3.0.2" "mypy==0.580" "numpy==1.16.2" "pytest-instafail==0.3.0" "pytest-timeout==1.2.0" "pytest==3.5.0" "pytz==2019.1" "regex==2017.4.5" "requests==2.18.0" "tqdm==4.31.1" "typeguard>=2.2.2"
@@ -43,6 +41,13 @@ wget -O gpt-2/models/124M/vocab.bpe https://openaipublic.blob.core.windows.net/g
 # USE_TORCH=1 because `datasets` will try to do something with tensorflow dataset which causes a bad interaction
 USE_TORCH=1 python launch.py train_reward $experiment $reward_experiment_name
 USE_TORCH=1 mpiexec -n 1 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
+
+VISIBLE_DEVICES="0,1,2,3,4,5,6,7" 
+USE_TORCH=1 mpiexec -n 8 python launch.py train_reward $experiment $reward_experiment_name
+USE_TORCH=1 VISIBLE_DEVICES="0" mpiexec -n 1 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
 
 bookcorpus
 https://huggingface.co/datasets/bookcorpus

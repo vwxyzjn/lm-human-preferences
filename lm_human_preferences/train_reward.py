@@ -5,6 +5,7 @@ import os
 from dataclasses import dataclass, field
 from functools import partial
 from typing import Optional
+import time
 
 import numpy as np
 import tensorflow as tf
@@ -258,6 +259,19 @@ class RewardModelTrainer():
 
 def train(hparams: HParams):
     with tf.Graph().as_default():
+        if MPI.COMM_WORLD.Get_rank() == 0:
+            import wandb
+            run_name = f"train_reward__{hparams.run.seed}__{int(time.time())}"
+            wandb.init(
+                project="lm-human-preferences",
+                entity="openrlbenchmark",
+                sync_tensorboard=True,
+                config=hparams.to_nested_dict(),
+                name=run_name,
+                save_code=True,
+            )
+
+
         hyperparams.dump(hparams)
         utils.set_mpi_seed(hparams.run.seed)
 

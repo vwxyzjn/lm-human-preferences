@@ -1,7 +1,4 @@
 # set up an AWS p3.16xlarge machine with ami-0869f17a1c79dad4c
-pip3 install poetry==1.3.1
-echo 'export PATH=~/.local/bin:$PATH' >> ~/.bashrc
-
 
 # install pyenv
 curl https://pyenv.run | bash
@@ -20,7 +17,7 @@ conda activate myenv
 
 pip install "cloudpickle==1.2.1" "dataclasses==0.6.0" "fire==0.1.3" "ftfy==5.4.1" "mpi4py==3.0.2" "mypy==0.580" "numpy==1.16.2" "pytest-instafail==0.3.0" "pytest-timeout==1.2.0" "pytest==3.5.0" "pytz==2019.1" "regex==2017.4.5" "requests==2.18.0" "tqdm==4.31.1" "typeguard>=2.2.2"
 pip install "google-api-python-client==1.7.8" "google-cloud-storage==1.13.0"
-pip install datasets
+pip install datasets==2.12.0 wandb==0.15.4
 
 experiment=descriptiveness
 reward_experiment_name=testdesc-$(date +%y%m%d%H%M)

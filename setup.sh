@@ -1,4 +1,6 @@
-# set up an AWS p3.16xlarge machine with ami-0869f17a1c79dad4c
+# set up an AWS p3dn.24xlarge machine (each GPU has 32 GB memory)
+# you will run into OOM issues with p3.16xlarge
+# ami-0705983c654abda59
 
 # install pyenv
 curl https://pyenv.run | bash
@@ -25,6 +27,13 @@ experiment_name=testdesc-$(date +%y%m%d%H%M)
 export USE_TORCH=1
 python launch.py train_policy $experiment $experiment_name
 USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
+
+experiment=sentiment
+experiment_name=testdesc-$(date +%y%m%d%H%M)
+USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=2 --task_id=$experiment
+USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
 
 
 

@@ -65,6 +65,7 @@ class HParams(hyperparams.HParams):
     task: lm_tasks.TaskHParams = field(default_factory=lm_tasks.TaskHParams)
     rewards: RewardHParams = field(default_factory=RewardHParams)
     ppo: PpoHParams = field(default_factory=PpoHParams)
+    task_id: str = None
 
     def validate(self, *, prefix=''):
         super().validate(prefix=prefix)

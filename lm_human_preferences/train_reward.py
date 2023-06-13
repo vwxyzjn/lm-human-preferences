@@ -31,7 +31,7 @@ class LabelHParams(hyperparams.HParams):
 class RunHParams(hyperparams.HParams):
     seed: Optional[int] = None
     log_interval: int = 10
-    save_interval: int = 50
+    save_interval: int = 300
     save_dir: Optional[str] = None
 
 @dataclass

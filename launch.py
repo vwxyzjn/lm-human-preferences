@@ -9,8 +9,12 @@ books_task = combos(
     bind('query_length', 64),
     bind('query_dataset', 'books'),
     bind('response_length', 24),
-    bind('start_text', '.'), # Start the context at the beginning of a sentence
-    bind('end_text', '.'), # End the context at the end of a sentence.
+    # bind('start_text', '.'), # Start the context at the beginning of a sentence
+    # bind('end_text', '.'), # End the context at the end of a sentence.
+    # Costa: HF's bookcorpus is already properly processes that starts and ends with a sentence
+    # https://huggingface.co/datasets/bookcorpus
+    bind('start_text', None),
+    bind('end_text', None),
     bind('truncate_token', 13), # Encoding of '.' -- end completions at the end of a sentence.
     bind('truncate_after', 16), # Make sure completions are at least 16 tokens long.
 

@@ -167,7 +167,7 @@ def get_experiments():
         # bind('rewards.adaptive_kl', 'on'),
         # bind('rewards.adaptive_kl.target', 18.0),
         bind('ppo.batch_size', 32),
-        bind('rewards.whiten', False),
+        bind('ppo.whiten_rewards', False),
 
         bind('run.seed', 1)
     )
@@ -185,7 +185,7 @@ def get_experiments():
         # bind('rewards.adaptive_kl', 'on'),
         # bind('rewards.adaptive_kl.target', 18.0),
         bind('ppo.batch_size', 32),
-        bind('rewards.whiten', False),
+        bind('ppo.whiten_rewards', False),
 
         bind('run.seed', 1)
     )

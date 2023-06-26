@@ -102,12 +102,8 @@ if hparams.rewards.train_new_model:
 # responses = oai_example_query_response[:,context_length:]
 # queries = oai_example_query_response[:,:context_length]
 
-queries = np.array([[23073,   ]])
-responses = np.array([[837,   339,   561,   307, 24447, 50259, 50259, 50259]])
-
-
-
-
+queries = np.array([[23073]])
+responses = np.array([[837,   339,   561]])
 comm = MPI.COMM_WORLD
 with tf.Graph().as_default():
     hyperparams.dump(hparams)
@@ -136,10 +132,10 @@ with tf.Graph().as_default():
     with tf.Session() as sess:
         init_ops.run()
 
-        for i in range(2):
+        for i in range(1):
             output = ref_policy.analyze_responses(queries, responses)
             print("logprobs", output['logprobs'])
-            print("logits", output['logits'], output['logits'].shape)
+            print("all_logits", output['all_logits'], output['all_logits'].shape)
             entropy = tf.reduce_sum(-output['logprobs'], axis=1)
             print("sess.run(entropy)", sess.run(entropy))
 

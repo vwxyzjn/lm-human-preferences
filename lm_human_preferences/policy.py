@@ -120,6 +120,7 @@ class Policy:
 
         logits /= self.temperature
         return dict(
+            logits = logits,
             logprobs = utils.logprobs_from_logits(logits=logits, labels=responses),
             entropies = utils.entropy_from_logits(logits),
             values = result['values'][:, context_length-1:-1],

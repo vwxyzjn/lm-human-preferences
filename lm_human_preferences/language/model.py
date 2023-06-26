@@ -287,7 +287,9 @@ class Model:
 
     def __call__(self, *, X, Y=None, past=None, past_tokens=None, mask=None,
                  padding_token: Optional[int]=None, do_dropout=False):
+        print("===============do_dropout", do_dropout)
         X = tf.convert_to_tensor(X, dtype=tf.int32)
+        X = tf.Print(X, [X], 'X')
         if mask is not None:
             mask = tf.convert_to_tensor(mask, dtype=tf.bool)
             assert mask.dtype == tf.bool
@@ -298,6 +300,8 @@ class Model:
             if past is not None:
                 assert past_tokens is not None, 'padding_token requires past_tokens'
                 mask = tf.concat([tf.not_equal(past_tokens, padding_token), mask], axis=1)
+
+        mask = tf.Print(mask, [mask, tf.reduce_sum(tf.cast(mask, tf.float32)), tf.shape(mask)], 'mask')
         with tf.variable_scope(self.scope, reuse=self.built, auxiliary_name_scope=not self.built):
             self.built = True
             results = {}
@@ -318,7 +322,13 @@ class Model:
             past_length = 0 if past is None else tf.shape(past)[-2]
 
             positions = positions_for(batch=batch, sequence=sequence, past_length=past_length, mask=mask)
-            h = embed(X, wte) + embed(positions, wpe)
+            positions = tf.Print(positions, [positions, tf.shape(positions)], 'positions')
+            wte_embed = embed(X, wte)
+            wte_embed = tf.Print(wte_embed, [wte_embed, tf.shape(wte_embed)], 'wte_embed')
+            pos_embed = embed(positions, wpe)
+            pos_embed = tf.Print(pos_embed, [pos_embed, tf.shape(pos_embed)], 'pos_embed')
+            h = wte_embed + pos_embed
+            h = tf.Print(h, [h, tf.shape(h)], 'h')
             # Transformer
             presents = []
             pasts = tf.unstack(past, axis=1) if past is not None else [None] * self.hparams.n_layer
@@ -328,9 +338,11 @@ class Model:
                 h, present = block(
                     h, 'h%d' % layer, past=past, mask=mask, do_dropout=do_dropout, scale=True,
                     hparams=self.hparams, seed=block_seed)
+                h = tf.Print(h, [h, tf.shape(h)], 'h%d' % layer)
                 presents.append(present)
             results['present'] = tf.stack(presents, axis=1)
             h = norm(h, 'ln_f')
+            h = tf.Print(h, [h, tf.shape(h)], 'h')
             if mask is not None:
                 # For non-present tokens, use the output from the last present token instead.
                 present_indices = utils.where(mask[:,past_length:], tf.tile(tf.range(sequence)[None,:], [batch, 1]), -1)
@@ -343,6 +355,8 @@ class Model:
             # Language model loss.  Do tokens <n predict token n?
             h_flat = tf.reshape(h, [batch*sequence, self.hparams.n_embd])
             flat_lm_logits = tf.matmul(h_flat, wte, transpose_b=True)
+            flat_lm_logits = tf.Print(flat_lm_logits, [flat_lm_logits, tf.shape(flat_lm_logits), flat_lm_logits[-1]], 'flat_lm_logits')
+
 
             labels = tf.concat([X[:, 1:], X[:, :1]], axis=1)
             flat_labels = tf.reshape(labels, [batch*sequence])
@@ -353,6 +367,7 @@ class Model:
 
             lm_losses = tf.reshape(flat_losses, [batch, sequence])
             lm_logits = tf.reshape(flat_lm_logits, [batch, sequence, -1])
+            lm_logits = tf.Print(lm_logits, [lm_logits, tf.shape(lm_logits), lm_logits[-1,-1]], 'lm_logits')
 
             relevant_losses = lm_losses[:, :-1]
             results['lm_all_losses'] = relevant_losses

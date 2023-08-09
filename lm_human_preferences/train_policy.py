@@ -418,17 +418,17 @@ def make_score_fn(hparams, score_model):
 
 
 def train(hparams: HParams):
-    # if MPI.COMM_WORLD.Get_rank() == 0:
-    #     import wandb
-    #     run_name = f"train_policy__{hparams.run.seed}__{int(time.time())}"
-    #     wandb.init(
-    #         project="lm-human-preferences",
-    #         entity="openrlbenchmark",
-    #         sync_tensorboard=True,
-    #         config=hparams.to_nested_dict(),
-    #         name=run_name,
-    #         save_code=True,
-    #     )
+    if MPI.COMM_WORLD.Get_rank() == 0:
+        import wandb
+        run_name = f"train_policy__{hparams.run.seed}__{int(time.time())}"
+        wandb.init(
+            project="lm-human-preferences",
+            entity="openrlbenchmark",
+            sync_tensorboard=True,
+            config=hparams.to_nested_dict(),
+            name=run_name,
+            save_code=True,
+        )
 
     save_dir = hparams.run.save_dir
     if hparams.rewards.train_new_model:

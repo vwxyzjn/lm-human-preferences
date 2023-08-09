@@ -83,5 +83,26 @@ python -c 'from tensorflow.python.client import device_lib; print(device_lib.lis
 
 wget https://openaipublic.blob.core.windows.net/lm-human-preferences/tldr/train-subset.json
 
+
+for seed in {1..2}; do
+    experiment=sentiment
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+for seed in {1..10}; do
+    experiment=descriptiveness
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+for seed in {1..10}; do
+    experiment=tldr
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+
 git config user.name "Costa Huang"
 git config user.email "costa.huang@outlook.com"
+

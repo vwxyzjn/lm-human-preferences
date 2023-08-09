@@ -12,6 +12,7 @@ import numpy as np
 import tensorflow as tf
 from mpi4py import MPI
 from tensorflow.contrib import summary
+from rich.console import Console
 
 from lm_human_preferences import lm_tasks, train_reward
 from lm_human_preferences.language import trained_models
@@ -133,6 +134,7 @@ class PPOTrainer():
         self.ref_policy = ref_policy
         self.score_fn = score_fn
         self.hparams = hparams
+        self.console = Console(force_terminal=True)
 
         if hparams.rewards.adaptive_kl is None:
             self.kl_ctl = FixedKLController(hparams.rewards.kl_coef)
@@ -273,11 +275,20 @@ class PPOTrainer():
         # Log samples
         for i in range(min(3, len(queries))):
             sample_kl = np.sum(logprobs[i] - ref_logprobs[i])
-            print(encoder.decode(queries[i][:self.hparams.task.query_length]).replace("\n", "⏎"))
-            print(encoder.decode(responses[i]).replace("\n", "⏎"))
-            print(f"  score = {scores[i]:+.2f}")
-            print(f"  kl = {sample_kl:+.2f}")
-            print(f"  total = {scores[i] - self.hparams.rewards.kl_coef * sample_kl:+.2f}")
+            sample_query = encoder.decode(queries[i][:self.hparams.task.query_length]).replace("\n", "⏎")
+            sample_response = encoder.decode(responses[i]).replace("\n", "⏎")
+            self.console.print(
+                f"[green]{sample_query}[/]"
+                f"\n[blue]{sample_response}[/]"
+                f"\n[red]reward: {scores[i]:+.2f}[/]"
+                f"\n[red]kl: {sample_kl:+.2f}[/]"
+                f"\n[red]total reward: {scores[i] - self.hparams.rewards.kl_coef * sample_kl:+.2f}[/]"
+            )
+            # print(encoder.decode(queries[i][:self.hparams.task.query_length]).replace("\n", "⏎"))
+            # print(encoder.decode(responses[i]).replace("\n", "⏎"))
+            # print(f"  score = {scores[i]:+.2f}")
+            # print(f"  kl = {sample_kl:+.2f}")
+            # print(f"  total = {scores[i] - self.hparams.rewards.kl_coef * sample_kl:+.2f}")
 
     def step(self):
         step_started_at = time.time()

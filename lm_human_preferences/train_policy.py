@@ -407,17 +407,17 @@ def make_score_fn(hparams, score_model):
 
 
 def train(hparams: HParams):
-    if MPI.COMM_WORLD.Get_rank() == 0:
-        import wandb
-        run_name = f"train_policy__{hparams.run.seed}__{int(time.time())}"
-        wandb.init(
-            project="lm-human-preferences",
-            entity="openrlbenchmark",
-            sync_tensorboard=True,
-            config=hparams.to_nested_dict(),
-            name=run_name,
-            save_code=True,
-        )
+    # if MPI.COMM_WORLD.Get_rank() == 0:
+    #     import wandb
+    #     run_name = f"train_policy__{hparams.run.seed}__{int(time.time())}"
+    #     wandb.init(
+    #         project="lm-human-preferences",
+    #         entity="openrlbenchmark",
+    #         sync_tensorboard=True,
+    #         config=hparams.to_nested_dict(),
+    #         name=run_name,
+    #         save_code=True,
+    #     )
 
     save_dir = hparams.run.save_dir
     if hparams.rewards.train_new_model:
@@ -463,10 +463,11 @@ def train(hparams: HParams):
             is_root=comm.Get_rank() == 0,
             embed_queries=lm_tasks.query_formatter(hparams.task, encoder),
             temperature=hparams.task.policy.temperature)
-
+        rank = MPI.COMM_WORLD.Get_rank()
+        seed = hparams.run.seed + rank * 100003  # Prime (kept for backwards compatibility even though it does nothing)
         query_sampler = lm_tasks.make_query_sampler(
             hparams=hparams.task, encoder=encoder, comm=comm,
-            batch_size=utils.exact_div(hparams.ppo.batch_size, comm.Get_size()),
+            batch_size=utils.exact_div(hparams.ppo.batch_size, comm.Get_size()), seed=seed,
         )
 
         per_rank_minibatch_size = utils.exact_div(hparams.ppo.batch_size, hparams.ppo.nminibatches * comm.Get_size())
@@ -515,7 +516,9 @@ def train(hparams: HParams):
                     increment_global_step.run()
 
                     if saver and global_step.eval() % hparams.run.save_interval == 0:
-                        saver.save(sess, checkpoint_dir, global_step=global_step)
+                        # saver.save(sess, checkpoint_dir, global_step=global_step)
+                        pass
             finally:
                 if saver:
-                    saver.save(sess, checkpoint_dir, global_step=global_step)
+                    # saver.save(sess, checkpoint_dir, global_step=global_step)
+                    pass

@@ -9,6 +9,8 @@ def books_generator(mode, seed=0, shuffle=False, comm=None):
         random.seed(seed)
         dataset = dataset.shuffle(seed)
 
-    for _, data in enumerate(dataset):
+    for i, data in enumerate(dataset):
+        if i == 0:
+            print("===========", data["text"])
         text = data["text"]
         yield text

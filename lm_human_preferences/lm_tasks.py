@@ -80,7 +80,7 @@ def query_formatter(hparams: TaskHParams, encoder):
     return query_formatter
 
 
-def make_query_sampler(*, hparams: TaskHParams, encoder, batch_size: int, mode='train', comm=None):
+def make_query_sampler(*, hparams: TaskHParams, encoder, batch_size: int, mode='train', comm=None, seed=0):
     if hparams.start_text:
         start_token, = encoder.encode(hparams.start_text)
     else:
@@ -93,7 +93,7 @@ def make_query_sampler(*, hparams: TaskHParams, encoder, batch_size: int, mode='
 
     data = datasets.get_dataset(hparams.query_dataset).tf_dataset(
         sequence_length=hparams.query_length, mode=mode, comm=comm, encoder=encoder,
-        start_token=start_token, end_token=end_token,
+        start_token=start_token, end_token=end_token, seed=seed,
     )
     data = data.map(lambda d: tf.cast(d['tokens'], tf.int32))
     data = data.batch(batch_size, drop_remainder=True)

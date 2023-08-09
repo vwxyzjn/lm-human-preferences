@@ -259,17 +259,17 @@ class RewardModelTrainer():
 
 def train(hparams: HParams):
     with tf.Graph().as_default():
-        if MPI.COMM_WORLD.Get_rank() == 0:
-            import wandb
-            run_name = f"train_reward__{hparams.run.seed}__{int(time.time())}"
-            wandb.init(
-                project="lm-human-preferences",
-                entity="openrlbenchmark",
-                sync_tensorboard=True,
-                config=hparams.to_nested_dict(),
-                name=run_name,
-                save_code=True,
-            )
+        # if MPI.COMM_WORLD.Get_rank() == 0:
+        #     import wandb
+        #     run_name = f"train_reward__{hparams.run.seed}__{int(time.time())}"
+        #     wandb.init(
+        #         project="lm-human-preferences",
+        #         entity="openrlbenchmark",
+        #         sync_tensorboard=True,
+        #         config=hparams.to_nested_dict(),
+        #         name=run_name,
+        #         save_code=True,
+        #     )
 
 
         hyperparams.dump(hparams)
@@ -288,10 +288,11 @@ def train(hparams: HParams):
             build_respond=False)
 
         reward_model = rewards.RewardModelTrainer(m, is_root=comm.Get_rank() == 0)
-
+        rank = MPI.COMM_WORLD.Get_rank()
+        seed = hparams.run.seed + rank * 100003  # Prime (kept for backwards compatibility even though it does nothing)
         query_sampler = lm_tasks.make_query_sampler(
             hparams=hparams.task, encoder=encoder, comm=comm,
-            batch_size=utils.exact_div(hparams.rollout_batch_size, comm.Get_size())
+            batch_size=utils.exact_div(hparams.rollout_batch_size, comm.Get_size()), seed=seed,
         )
 
         tf.train.create_global_step()

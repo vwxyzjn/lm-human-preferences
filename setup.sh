@@ -29,12 +29,38 @@ python launch.py train_policy $experiment $experiment_name
 USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
 
 
-experiment=sentiment
+for seed in {1..2}; do
+    experiment=sentiment
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+for seed in {1..10}; do
+    experiment=descriptiveness
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+for seed in {1..10}; do
+    experiment=tldr
+    experiment_name=testdesc-$(date +%y%m%d%H%M)
+    USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
+    USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+done
+
+
+experiment=cnndm
 experiment_name=testdesc-$(date +%y%m%d%H%M)
-USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=2 --task_id=$experiment
+USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=$seed --task_id=$experiment --rewards.train_new_model.run.seed=$seed
 USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
 
 
+
+
+experiment=tldr
+experiment_name=testdesc-$(date +%y%m%d%H%M)
+USE_TORCH=1 python launch.py train_policy $experiment $experiment_name --run.seed=1 --task_id=$experiment --rewards.train_new_model.run.seed=1
+USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
 
 
 mkdir -p gpt-2/encodings
@@ -67,6 +93,21 @@ USE_TORCH=1 python launch.py train_policy $experiment $policy_experiment_name --
 USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
 
 
+
+
+experiment=sentiment
+reward_experiment_name=testdesc-$(date +%y%m%d%H%M)
+USE_TORCH=1 python launch.py train_reward $experiment $reward_experiment_name --save_dir=/home/ubuntu/lm-human-preferences/reward
+USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
+
+trained_reward_model=/home/ubuntu/lm-human-preferences/reward/testdesc-2306281725/reward_model
+experiment=sentiment
+policy_experiment_name=testdesc-$(date +%y%m%d%H%M)
+USE_TORCH=1 python launch.py train_policy $experiment $policy_experiment_name --rewards.trained_model $trained_reward_model --rewards.train_new_model 'off'
+USE_TORCH=1 mpiexec -n 8 python -c 'import sys; import pickle; pickle.loads(open("/tmp/pickle_fn", "rb").read())()'
+
+
 bookcorpus
 https://huggingface.co/datasets/bookcorpus
 
@@ -85,3 +126,5 @@ wget https://openaipublic.blob.core.windows.net/lm-human-preferences/tldr/train-
 
 git config user.name "Costa Huang"
 git config user.email "costa.huang@outlook.com"
+
+CUDA_VISIBLE_DEVICES="-1" python -i test_decode.py
